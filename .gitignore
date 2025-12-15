@@ -6,7 +6,7 @@
 .settings/
 
 # Maven
-target/
+.ipfs-miniproject/target/
 
 # OS
 .DS_Store
