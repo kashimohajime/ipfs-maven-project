@@ -25,5 +25,6 @@ Download depuis IPFS
 Pin / Unpin
 
 🚨 Remarques:
-Modifier la ligne 16 dans pom.xml avec la version de votre jdk installé
-Utiliser de préférence l'IDE VScode avec l'extension de java : Extension Pack for Java
+Modifier la ligne 16 dans pom.xml avec la version de votre jdk installé.
+Utiliser de préférence l'IDE VScode avec l'extension de java : Extension Pack for Java.
+utiliser la commande ipfs pin ls dans un nouveau terminal pour vérifier le pin.
