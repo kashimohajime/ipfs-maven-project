@@ -5,98 +5,97 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.stage.FileChooser;
-
+import javafx.stage.Stage;
 
 import java.io.File;
 
+/**
+ * Classe principale JavaFX.
+ * Elle fournit une interface graphique pour interagir avec IPFS.
+ */
 public class IPFSJavaFXApp extends Application {
 
+    // Instance du client IPFS
     private final IPFSClient ipfs = new IPFSClient();
 
     @Override
     public void start(Stage stage) {
 
+        // Titre de l'application
         Label title = new Label("IPFS JavaFX Application");
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        TextField fileField = new TextField();
-        fileField.setPromptText("File name (ex: test.txt)");
-
+        // Champ pour afficher ou saisir le CID
         TextField cidField = new TextField();
         cidField.setPromptText("CID");
 
+        // Zone d'affichage des messages
         TextArea output = new TextArea();
         output.setEditable(false);
 
+        // Boutons d'action
         Button uploadBtn = new Button("Upload");
         Button downloadBtn = new Button("Download");
         Button pinBtn = new Button("Pin");
         Button unpinBtn = new Button("Unpin");
 
+        // Gestion de l'upload
         uploadBtn.setOnAction(e -> {
             try {
-                File file = new File(fileField.getText());
-                if (!file.exists()) {
-                    output.setText("❌ File not found");
-                    return;
-                }
+                FileChooser chooser = new FileChooser();
+                File file = chooser.showOpenDialog(stage);
+
+                if (file == null) return;
+
                 String cid = ipfs.uploadFile(file);
-                output.setText("✅ Uploaded\nCID:\n" + cid);
                 cidField.setText(cid);
+                output.setText("Upload réussi\nCID : " + cid);
+
             } catch (Exception ex) {
-                output.setText("Error: " + ex.getMessage());
+                output.setText("Erreur : " + ex.getMessage());
             }
         });
 
-      downloadBtn.setOnAction(e -> {
-    try {
-        String cid = cidField.getText();
+        // Gestion du téléchargement
+        downloadBtn.setOnAction(e -> {
+            try {
+                FileChooser chooser = new FileChooser();
+                File file = chooser.showSaveDialog(stage);
 
-        if (cid.isEmpty()) {
-            output.setText("❌ CID is empty");
-            return;
-        }
+                if (file == null) return;
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save file from IPFS");
-        fileChooser.setInitialFileName("downloaded_file");
+                ipfs.downloadFile(cidField.getText(), file);
+                output.setText("Fichier téléchargé avec succès");
 
-        File destination = fileChooser.showSaveDialog(stage);
+            } catch (Exception ex) {
+                output.setText("Erreur : " + ex.getMessage());
+            }
+        });
 
-        if (destination != null) {
-            ipfs.download(cid, destination);
-            output.setText("✅ File downloaded to:\n" + destination.getAbsolutePath());
-        }
-
-    } catch (Exception ex) {
-        output.setText("Error: " + ex.getMessage());
-    }
-});
-
-
+        // Pin du fichier
         pinBtn.setOnAction(e -> {
             try {
                 ipfs.pin(cidField.getText());
-                output.setText("📌 File pinned");
+                output.setText("Fichier pinné avec succès");
             } catch (Exception ex) {
-                output.setText("Error: " + ex.getMessage());
+                output.setText("Erreur : " + ex.getMessage());
             }
         });
 
+        // Unpin du fichier
         unpinBtn.setOnAction(e -> {
             try {
                 ipfs.unpin(cidField.getText());
-                output.setText("❌ File unpinned");
+                output.setText("Fichier dépinné");
             } catch (Exception ex) {
-                output.setText("Error: " + ex.getMessage());
+                output.setText("Erreur : " + ex.getMessage());
             }
         });
 
+        // Organisation de l'interface
         VBox layout = new VBox(10,
                 title,
-                fileField,
                 uploadBtn,
                 cidField,
                 downloadBtn,
@@ -116,4 +115,3 @@ public class IPFSJavaFXApp extends Application {
         launch();
     }
 }
-
